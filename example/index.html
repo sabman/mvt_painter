@@ -1,0 +1,35 @@
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>MVT viewer | CARTO</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='../dist/mvt-painter.js'></script>
+    <style>
+        body {
+            background: lightblue;
+            padding: 0px;
+        }
+
+        canvas {
+            background: #fff;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="grid" />
+<script>
+    var bw = 4096;
+    var bh = 4096;
+    var canvas = document.getElementById("grid");
+    canvas.setAttribute('height', bh)
+    canvas.setAttribute('width', bw);
+    mvtpainter.loadTile('http://localhost:8889/boundary/666/666/666.mvt?api_key=wadus')
+        .then(geometries => {
+            var context = canvas.getContext("2d");
+            mvtpainter.drawGeometry(geometries[0],context,window.requestAnimationFrame);
+        });
+</script>
+</body>
+</html>
