@@ -51,25 +51,27 @@ function decomposeLine(source, destination, spacePerPoint) {
 }
 
 function drawLine(index, points, ctx, raf) {
-    let linePoints = decomposeLine(points[index-1], points[index], 0.0001);
-    ctx.beginPath();
-    ctx.moveTo(points[index-1].x, points[index-1].y);
-    ctx.stroke();
-    ctx.closePath();
-    linePoints.forEach((linePoint, i) => {
+    if (index < points.length) {
+        let linePoints = decomposeLine(points[index-1], points[index], 100);
         ctx.beginPath();
-        if (i === 0) {
-            ctx.moveTo(points[index].x, points[index].y);
-        }
-        ctx.lineTo(linePoint.x, linePoint.y);
+        ctx.moveTo(points[index-1].x, points[index-1].y);
         ctx.stroke();
         ctx.closePath();
-    });
-    let rot = -Math.atan2(points[index-1].x - points[index].x, points[index-1].y - points[index].y);
-    arrowHead(ctx, points[index].x, points[index].y, rot + Math.PI);
-    raf(function() {
-        drawLine(index+1, points, ctx,raf);
-    });
+        linePoints.forEach((linePoint, i) => {
+            ctx.beginPath();
+            if (i === 0) {
+                ctx.moveTo(points[index].x, points[index].y);
+            }
+            ctx.lineTo(linePoint.x, linePoint.y);
+            ctx.stroke();
+            ctx.closePath();
+        });
+        //let rot = -Math.atan2(points[index-1].x - points[index].x, points[index-1].y - points[index].y);
+        //arrowHead(ctx, points[index].x, points[index].y, rot + Math.PI);
+        raf(function() {
+            drawLine(index+1, points, ctx,raf);
+        });
+    }
 }
 
 function arrowHead(ctx, x, y, rot) {
@@ -87,9 +89,11 @@ function arrowHead(ctx, x, y, rot) {
 
 
 function drawGeometry(geometry, ctx, raf) {
-    raf(function() {
-        drawLine(1, geometry[0], ctx,raf);
+    geometry.forEach(points => {
+        raf(function() {
+            drawLine(1, points, ctx,raf);
+        });
     });
 }
 
-export { loadTile, drawGeometry, drawLine };
+export { loadTile, drawGeometry };
