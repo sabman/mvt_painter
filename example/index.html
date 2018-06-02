@@ -25,10 +25,12 @@
     var canvas = document.getElementById("grid");
     canvas.setAttribute('height', bh)
     canvas.setAttribute('width', bw);
-    mvtpainter.loadTile('http://localhost:8889/boundary/666/666/666.mvt?api_key=wadus')
+    mvtpainter.loadTile('http://localhost:8889/boundary/1/0/0.mvt?api_key=wadus')
         .then(geometries => {
             var context = canvas.getContext("2d");
-            mvtpainter.drawGeometry(geometries[0],context,window.requestAnimationFrame);
+            geometries.forEach(geometry => {
+                mvtpainter.drawGeometry(geometry,context,window.requestAnimationFrame);
+            });
         });
 </script>
 </body>
