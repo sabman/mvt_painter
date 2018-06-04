@@ -19,3 +19,5 @@ the JS is in the `dist` folder.
 
 If you want to play after build the library, you can use the `example/index.html` ready to play
 app. You can see it in action below
+
+![in action](img/mvt_painter_in_action.gif)
