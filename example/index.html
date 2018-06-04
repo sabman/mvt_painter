@@ -47,11 +47,11 @@
     var canvas = document.getElementById("grid");
     var url = document.getElementById('url');
     var buttonLoadTile = document.getElementById('loadTile');
-    buttonLoadTile.addEventListener('click', loadTile);
     var geomSelector = document.getElementById('geometries');
-    geomSelector.addEventListener('change', paintGeometry);
     var geometries = [];
     var previousIndex = null;
+    geomSelector.addEventListener('change', paintGeometry);
+    buttonLoadTile.addEventListener('click', loadTile);
     canvas.setAttribute('height', bh)
     canvas.setAttribute('width', bw);
     painter = new carto.MVTPainter(url.getAtt)
@@ -60,7 +60,7 @@
             geometries = gs
             geomSelector.innerHTML = '';
             var option = document.createElement("option");
-            option.text = 'Select geometry to draw';
+            option.text = 'All geometries';
             option.value = "-1";
             geomSelector.appendChild(option);
             geometries.forEach((geometry,index) => {
@@ -74,17 +74,16 @@
 
     function paintGeometry() {
         var selectedIndex = geomSelector.options[geomSelector.selectedIndex].value;
-        if (selectedIndex !== "-1") {
-            var speed = document.getElementById('speed').value;
-            var arrow = document.getElementById('arrowhead').checked;
-            var context = canvas.getContext("2d");
-            if (previousIndex !== null) {
-                painter.stopAnimation(previousIndex);
-            }
-            previousIndex = selectedIndex;
-            context.clearRect(0,0, bw, bh);
-            painter.drawGeometry(geometries, selectedIndex, +speed, arrow, context, window.requestAnimationFrame);
+        var speed = document.getElementById('speed').value;
+        var arrow = document.getElementById('arrowhead').checked;
+        var context = canvas.getContext("2d");
+        if (previousIndex !== null) {
+            painter.stopAnimation();
         }
+        previousIndex = selectedIndex;
+        context.clearRect(0,0, bw, bh);
+        options = {speed: +speed, arrow: arrow}
+        painter.drawGeometry(geometries, selectedIndex, options, context, window.requestAnimationFrame);
     }
 </script>
 </body>

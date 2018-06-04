@@ -80,7 +80,7 @@ export default class MVTPainter {
         return translatedPoints;
     }
 
-    _drawLineAllAtOnce(points, minWidthAndHeight, speed, arrow, ctx) {
+    _drawLineAllAtOnce(points, minWidthAndHeight, ctx) {
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) {
@@ -90,13 +90,15 @@ export default class MVTPainter {
         ctx.closePath();
     }
 
-    stopAnimation(index) {
-        this._animationRunning[index] = false;
+    stopAnimation() {
+        this._animationRunning.forEach(index => {
+            this._animationRunning[index] = false;
+        });
     }
 
-    _drawLine(geometryIndex, index, points, minWidthAndHeight, speed, arrow, ctx, raf) {
+    _drawLine(geometryIndex, index, points, minWidthAndHeight, options, ctx, raf) {
         if (this._animationRunning[geometryIndex] && index < points.length) {
-            let linePoints = this._decomposeLine(points[index-1], points[index], speed);
+            let linePoints = this._decomposeLine(points[index-1], points[index], options.speed);
             ctx.beginPath();
             ctx.moveTo(points[index-1].x, points[index-1].y);
             ctx.stroke();
@@ -110,19 +112,20 @@ export default class MVTPainter {
                 ctx.stroke();
                 ctx.closePath();
             });
-            if (arrow) {
+            if (options.arrow) {
                 let rot = -Math.atan2(points[index-1].x - points[index].x, points[index-1].y - points[index].y);
                 this._arrowHead(ctx, points[index].x, points[index].y, rot + Math.PI);
             }
             const that = this;
             raf(function() {
-                that._drawLine(geometryIndex, index+1, points, minWidthAndHeight, speed, arrow, ctx,raf);
+                that._drawLine(geometryIndex, index+1, points, minWidthAndHeight, options, ctx,raf);
             });
         }
     }
 
     _arrowHead(ctx, x, y, rot) {
-        // Picked from stackoverflow, done by gman (https://stackoverflow.com/a/35873025)
+        // Picked from stackoverflow, done by gman
+        // (https://stackoverflow.com/a/35873025)
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(rot);
@@ -135,36 +138,44 @@ export default class MVTPainter {
         ctx.restore();
     }
 
-    _getMinWidthAndHeight(geometry) {
-        var minX = geometry[0][0].x;
-        var minY = geometry[0][0].y;
-        geometry.forEach(points => {
-            points.forEach(point => {
-                if (point.x < minX) {
-                    minX=point.x;
-                }
-                if (point.y < minY) {
-                    minY=point.y;
-                }
+    _getMinWidthAndHeight(geometries) {
+        var minX = geometries[0][0][0].x;
+        var minY = geometries[0][0][0].y;
+        geometries.forEach(geometry => {
+            geometry.forEach(points => {
+                points.forEach(point => {
+                    if (point.x < minX) {
+                        minX=point.x;
+                    }
+                    if (point.y < minY) {
+                        minY=point.y;
+                    }
+                });
             });
         });
 
         return {x: minX, y: minY};
     }
 
-    drawGeometry(geometries, index, speed, arrow, ctx, raf) {
-        const geometry = geometries[index] ;
+    drawGeometry(geometries, index, options, ctx, raf) {
+        var selectedGeometries = geometries;
+        if (index && index >= 0) {
+            selectedGeometries = [];
+            selectedGeometries.push(geometries[index]);
+        }
         const that = this;
-        const minWidthAndHeight = this._getMinWidthAndHeight(geometry);
-        this._animationRunning[index] = true;
-        geometry.forEach(points => {
-            const translatedPoints = this._translatePoints(points, minWidthAndHeight);
-            raf(function() {
-                if (speed === 0) {
-                    that._drawLineAllAtOnce(translatedPoints, minWidthAndHeight, speed, arrow, ctx);
-                } else {
-                    that._drawLine(index, 1, translatedPoints, minWidthAndHeight, speed, arrow, ctx,raf);
-                }
+        const minWidthAndHeight = this._getMinWidthAndHeight(selectedGeometries);
+        selectedGeometries.forEach((geometry, index) => {
+            this._animationRunning[index] = true;
+            geometry.forEach(points => {
+                const translatedPoints = this._translatePoints(points, minWidthAndHeight);
+                raf(function() {
+                    if (options.speed === 0) {
+                        that._drawLineAllAtOnce(translatedPoints, minWidthAndHeight, ctx);
+                    } else {
+                        that._drawLine(index, 1, translatedPoints, minWidthAndHeight, options, ctx,raf);
+                    }
+                });
             });
         });
     }
