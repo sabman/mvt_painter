@@ -80,16 +80,14 @@ export default class MVTPainter {
         return translatedPoints;
     }
 
-    _drawLineAllAtOnce(index, points, minWidthAndHeight, ctx) {
-        if (index < points.length) {
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; index < points.length; index++) {
-                ctx.lineTo(points[i].x, points[i].y);
-            }
-            ctx.stroke();
-            ctx.closePath();
+    _drawLineAllAtOnce(points, minWidthAndHeight, speed, arrow, ctx) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
         }
+        ctx.stroke();
+        ctx.closePath();
     }
 
     stopAnimation(index) {
@@ -162,7 +160,11 @@ export default class MVTPainter {
         geometry.forEach(points => {
             const translatedPoints = this._translatePoints(points, minWidthAndHeight);
             raf(function() {
-                that._drawLine(index, 1, translatedPoints, minWidthAndHeight, speed, arrow, ctx,raf);
+                if (speed === 0) {
+                    that._drawLineAllAtOnce(translatedPoints, minWidthAndHeight, speed, arrow, ctx);
+                } else {
+                    that._drawLine(index, 1, translatedPoints, minWidthAndHeight, speed, arrow, ctx,raf);
+                }
             });
         });
     }
