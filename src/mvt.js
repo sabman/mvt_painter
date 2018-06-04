@@ -124,6 +124,7 @@ export default class MVTPainter {
     }
 
     _arrowHead(ctx, x, y, rot) {
+        // Picked from stackoverflow, done by gman (https://stackoverflow.com/a/35873025)
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(rot);
