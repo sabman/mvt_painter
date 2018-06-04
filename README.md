@@ -2,7 +2,7 @@
 
 This is a tool to paint MVT data from URLS in order to show how are the MVT data painted.
 
-### Why is this need?
+### Why is this needed?
 
 I can think a couple of reasons:
 
