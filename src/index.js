@@ -1,7 +1,6 @@
 
-import { loadTile, drawGeometry } from './mvt.js';
+import { MVTPainter } from './mvt.js';
 
 export {
-    loadTile,
-    drawGeometry
+    MVTPainter
 };

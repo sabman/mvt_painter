@@ -6,7 +6,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '..', 'dist'),
         filename: 'mvt-painter.js',
-        library: 'mvtpainter',
+        library: 'carto',
         libraryTarget: 'umd'
     },
     devtool: 'sourcemap',
