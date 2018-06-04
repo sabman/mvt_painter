@@ -13,26 +13,79 @@
         canvas {
             background: #fff;
             margin: 0px;
-            padding: 0px;
+            padding: 20px;
         }
+
     </style>
 </head>
 <body>
+    <div class="controls">
+        <span>
+            <label for="url">Tile URL</label>
+            <input type="text" size="60" id="url" />
+            <button id="loadTile">Load tile</button>
+        </span>
+        <span class="geometries">
+            <label for="geometries">Select geometry to draw</label>
+            <select id="geometries">
+                <option value="-1">No geometries loaded</option>
+            </select>
+        </span>
+        <span>
+            <label for="speed">Drawing speed</label>
+            <input type="text" id="speed" value="1" />
+        </span>
+        <span>
+            <label for="speed">Show arrow heads</label>
+            <input type="checkbox" id="arrowhead" />
+        </span>
+    </div>
     <canvas id="grid" />
 <script>
-    var bw = 4096;
-    var bh = 4096;
+    var bw = 1900;
+    var bh = 900;
     var canvas = document.getElementById("grid");
+    var url = document.getElementById('url');
+    var buttonLoadTile = document.getElementById('loadTile');
+    buttonLoadTile.addEventListener('click', loadTile);
+    var geomSelector = document.getElementById('geometries');
+    geomSelector.addEventListener('change', paintGeometry);
+    var geometries = [];
+    var previousIndex = null;
     canvas.setAttribute('height', bh)
     canvas.setAttribute('width', bw);
-    painter = new carto.MVTPainter('http://localhost:8889/boundary/{z}/{x}/{y}.mvt?api_key=wadus')
-    painter.loadTile(0,0,1)
-        .then(geometries => {
-            var context = canvas.getContext("2d");
-            geometries.forEach(geometry => {
-                painter.drawGeometry(geometry,context,window.requestAnimationFrame);
+    painter = new carto.MVTPainter(url.getAtt)
+    function loadTile() {
+        painter.loadTile(url.value).then(gs => {
+            geometries = gs
+            geomSelector.innerHTML = '';
+            var option = document.createElement("option");
+            option.text = 'Select geometry to draw';
+            option.value = "-1";
+            geomSelector.appendChild(option);
+            geometries.forEach((geometry,index) => {
+                var option = document.createElement("option");
+                option.text = 'Geometry # '+index+' ('+geometry.length+' lines)';
+                option.value = index;
+                geomSelector.appendChild(option);
             });
         });
+    }
+
+    function paintGeometry() {
+        var selectedIndex = geomSelector.options[geomSelector.selectedIndex].value;
+        if (selectedIndex !== "-1") {
+            var speed = document.getElementById('speed').value;
+            var arrow = document.getElementById('arrowhead').checked;
+            var context = canvas.getContext("2d");
+            if (previousIndex !== null) {
+                painter.stopAnimation(previousIndex);
+            }
+            previousIndex = selectedIndex;
+            context.clearRect(0,0, bw, bh);
+            painter.drawGeometry(geometries, selectedIndex, +speed, arrow, context, window.requestAnimationFrame);
+        }
+    }
 </script>
 </body>
 </html>
