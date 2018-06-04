@@ -1,6 +1,10 @@
 # MVT Painter
 
-This is a tool to paint MVT data from URLS in order to show how are the MVT data painted.
+This is a tool to paint MVT data from URLS in order to show how are the MVT data drawed.
+
+The main idea to create this tool was to use it as a debugger for MVT. You could say "why
+don't you use something like Carto-VL?", well sometimes you need to check for a tile or decompose
+it in their geometries and that's where this tool brights :)
 
 ### Why is this needed?
 
